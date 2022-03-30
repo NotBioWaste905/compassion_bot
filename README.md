@@ -14,4 +14,3 @@
 
 **@upholding_bot**
 
-https://www.pythonanywhere.com/user/andreu1/files/home/andreu1
