@@ -4,41 +4,46 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 def create_db():
     try:
-        cursor, connection = connect_to_db()
-
-        sql_create_database = '''CREATE TABLE Q_N_A
-                          (ID INT PRIMARY KEY     NOT NULL,
-                          PROBLEM        TEXT   NOT NULL,
-                          ANSWER         TEXT   NOT NULL); '''
+        # Подключение к существующей базе данных
+        connection = psycopg2.connect(user="postgres",
+                                      # пароль, который указали при установке PostgreSQL
+                                      password="1111",
+                                      host="127.0.0.1",
+                                      port="5432")
+        connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        # Курсор для выполнения операций с базой данных
+        cursor = connection.cursor()
+        sql_create_database = 'create database postgres_db'
         cursor.execute(sql_create_database)
-        connection.commit()
     except (Exception, Error) as error:
         print("Ошибка при работе с PostgreSQL", error)
     finally:
         if connection:
-            print("База данных создана.")
-            disconnect(cursor, connection)
-
-def connect_to_db():
-    connection = psycopg2.connect(user="postgres",
-                                  password="1111",
-                                  host="localhost")
-    connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-    cursor = connection.cursor()
-    print("Соединение с PostgreSQL установлено.")
+            cursor.close()
+            connection.close()
+            print("Соединение с PostgreSQL закрыто")
 
     return cursor, connection
 
-def disconnect(cursor, connection):
+def disconnect(cur, con):
     cursor.close()
     connection.close()
     print("Соединение с PostgreSQL закрыто.")
 
-def insert_data():
-    pass
+def insert_data(cur, con, id, q, a):
+    insert_query = f""" INSERT INTO Q_N_A (ID, PROBLEM, ANSWER) VALUES ({id}, {q}, {a})"""
+    cur.execute(insert_query)
+    con.commit()
 
-def read_data():
-    pass
+def read_data(cur):
+    read_query = f"""SELECT * FROM Q_N_A"""
+    cur.execute(insert_query)
+    while True:
+        result = cur.fetchone()
+        if result is not None:
+            print(result)
+        else:
+            break
 
 if __name__ == '__main__':
     create_db()

@@ -4,7 +4,7 @@ import json
 import re
 from tqdm import tqdm
 
-import util.db_operator as db
+# import util.db_operator as db
 
 posts = {}
 
@@ -28,7 +28,7 @@ def get_urls(URL, multipage=False):
 
     return urls
 
-def get_data(URL):
+def get_data(url):
     page = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'})
     soup = bs(page.text, "html.parser")
 
@@ -55,9 +55,11 @@ def get_data(URL):
 if __name__ == '__main__':
     # cur, con = db.connect_to_db()
     id = 0
-    for page in tqdm(range(0, 13344)):
-        for url in get_urls(f"https://psiholog.ru/otvety-psihologov/{page}"):
-            get_data(url)
+    for page in tqdm(range(0, 28495//2)):
+        try:
+            get_data(f"https://psiholog.ru/vopros/{page}")
+        except:
+            print(page, "no data")
             # print(page)
     #         id += 1
     #         q, a = get_data(url)
